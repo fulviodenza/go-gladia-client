@@ -2,6 +2,8 @@
 
 This project is a Go client for the Gladia.io transcription service. It provides an easy-to-use interface for interacting with the transcription API, allowing users to send audio files for transcription and receive the results.
 
+<a href="https://pkg.go.dev/github.com/fulviodenza/go-gladia-client">Documentation</a>
+
 ## Project Structure
 
 ```
