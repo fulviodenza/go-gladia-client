@@ -71,7 +71,7 @@ func (c *Client) UploadFile(ctx context.Context, filePath string) (*UploadRespon
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 		bodyBytes, _ := io.ReadAll(resp.Body)
 		return nil, fmt.Errorf("received non-200 response: %s, body: %s", resp.Status, string(bodyBytes))
 	}
