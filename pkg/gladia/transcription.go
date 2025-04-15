@@ -108,17 +108,12 @@ func (s *Client) Transcribe(ctx context.Context, audioURL string) (*Transcriptio
 		return nil, fmt.Errorf("received non-200 response: %s", resp.Status)
 	}
 
-	p := []byte{}
-	_, err = resp.Body.Read(p)
-	if err != nil {
-		return nil, fmt.Errorf("could not read body: %v", err)
+	var result TranscriptionResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
-	result := &TranscriptionResponse{}
-	err = json.Unmarshal(p, &result)
-	if err != nil {
-		return nil, fmt.Errorf("could not unmarshal body: %v", err)
-	}
-	return result, nil
+
+	return &result, nil
 }
 
 // GetTranscriptionResult retrieves the result of a transcription by its ID
