@@ -19,4 +19,5 @@ go-gladia-client
 ```
 
 An example of how to use this library is here:
+
 notion-echo bot: https://github.com/fulviodenza/notion-echo/blob/main/adapters/gladia/gladia.go
