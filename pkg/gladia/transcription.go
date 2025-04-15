@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 )
 
-const gladiaHeaderKey = "x-gladia-key:"
+const gladiaHeaderKey = "x-gladia-key"
 const uploadEndpoint = "v2/upload"
 const transcribeEndpoint = "v2/pre-recorded/"
 
