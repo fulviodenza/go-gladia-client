@@ -14,7 +14,7 @@ import (
 
 const gladiaHeaderKey = "x-gladia-key:"
 const uploadEndpoint = "v2/upload"
-const transcribeEndpoint = "v2/pre-recorded"
+const transcribeEndpoint = "v2/pre-recorded/"
 
 // UploadResponse represents the response from the Gladia upload API
 type UploadResponse struct {
@@ -111,35 +111,56 @@ func (s *Client) Transcribe(ctx context.Context, audioURL string) error {
 	return nil
 }
 
-func (s *Client) GetResult(ctx context.Context, id string) (string, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.BaseURL+transcribeEndpoint+id, nil)
+// GetTranscriptionResult retrieves the result of a transcription by its ID
+func (c *Client) GetTranscriptionResult(ctx context.Context, transcriptionID string) (*CompletedTranscriptionResult, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BaseURL+transcribeEndpoint+transcriptionID, nil)
 	if err != nil {
-		return "", fmt.Errorf("failed to create request: %w", err)
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set(gladiaHeaderKey, s.APIKey)
+	req.Header.Set(gladiaHeaderKey, c.APIKey)
 
-	resp, err := s.httpClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("failed to send request: %w", err)
+		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("received non-200 response: %s", resp.Status)
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("received non-200 response: %s, body: %s", resp.Status, string(body))
 	}
 
-	p := []byte{}
-	_, err = resp.Body.Read(p)
+	var result CompletedTranscriptionResult
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return &result, nil
+}
+
+// GetTranscriptionStatus checks the status of a transcription by its ID
+func (c *Client) GetTranscriptionStatus(ctx context.Context, transcriptionID string) (*GetTranscriptionStatus, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.BaseURL+transcribeEndpoint+transcriptionID, nil)
 	if err != nil {
-		return "", err
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
+	req.Header.Set(gladiaHeaderKey, c.APIKey)
 
-	message := ""
-	err = json.Unmarshal(p, &message)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return "", err
+		return nil, fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("received non-200 response: %s, body: %s", resp.Status, string(body))
 	}
 
-	return message, nil
+	var status GetTranscriptionStatus
+	if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return &status, nil
 }
