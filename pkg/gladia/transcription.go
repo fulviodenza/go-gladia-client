@@ -84,31 +84,41 @@ func (c *Client) UploadFile(ctx context.Context, filePath string) (*UploadRespon
 	return &uploadResponse, nil
 }
 
-func (s *Client) Transcribe(ctx context.Context, audioURL string) error {
+func (s *Client) Transcribe(ctx context.Context, audioURL string) (*TranscriptionResponse, error) {
 	reqBody := TranscriptionRequest{AudioURL: audioURL}
 	body, err := json.Marshal(reqBody)
 	if err != nil {
-		return fmt.Errorf("failed to marshal request body: %w", err)
+		return nil, fmt.Errorf("failed to marshal request body: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, s.BaseURL+transcribeEndpoint, bytes.NewBuffer(body))
 	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set(gladiaHeaderKey, s.APIKey)
 
 	resp, err := s.httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to send request: %w", err)
+		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		return fmt.Errorf("received non-200 response: %s", resp.Status)
+		return nil, fmt.Errorf("received non-200 response: %s", resp.Status)
 	}
 
-	return nil
+	p := []byte{}
+	_, err = resp.Body.Read(p)
+	if err != nil {
+		return nil, fmt.Errorf("could not read body: %v", err)
+	}
+	result := &TranscriptionResponse{}
+	err = json.Unmarshal(p, &result)
+	if err != nil {
+		return nil, fmt.Errorf("could not unmarshal body: %v", err)
+	}
+	return result, nil
 }
 
 // GetTranscriptionResult retrieves the result of a transcription by its ID
