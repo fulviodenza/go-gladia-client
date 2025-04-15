@@ -17,3 +17,6 @@ go-gladia-client
 ├── go.sum                 # Checksums for module dependencies
 └── README.md              # Project documentation
 ```
+
+An example of how to use this library is here:
+notion-echo bot: https://github.com/fulviodenza/notion-echo/blob/main/adapters/gladia/gladia.go
