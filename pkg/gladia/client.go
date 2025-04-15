@@ -7,12 +7,18 @@ import (
 
 const defaultBaseURL = "https://api.gladia.io/"
 const defaultTimeout = 30 * time.Second
+const gladiaHeaderKey = "x-gladia-key"
+
+// HTTPDoer represents the minimal interface needed for HTTP operations
+type HTTPDoer interface {
+	Do(req *http.Request) (*http.Response, error)
+}
 
 // Client is the client for interacting with the Gladia API
 type Client struct {
 	APIKey     string
 	BaseURL    string
-	httpClient *http.Client
+	httpClient HTTPDoer
 }
 
 // NewClient creates a new Gladia API client
@@ -44,7 +50,7 @@ func WithBaseURL(url string) ClientOption {
 }
 
 // WithHTTPClient sets the HTTP client for the client
-func WithHTTPClient(httpClient *http.Client) ClientOption {
+func WithHTTPClient(httpClient HTTPDoer) ClientOption {
 	return func(c *Client) {
 		c.httpClient = httpClient
 	}
@@ -53,6 +59,8 @@ func WithHTTPClient(httpClient *http.Client) ClientOption {
 // WithTimeout sets the timeout duration for the HTTP client
 func WithTimeout(timeout time.Duration) ClientOption {
 	return func(c *Client) {
-		c.httpClient.Timeout = timeout
+		if httpClient, ok := c.httpClient.(*http.Client); ok {
+			httpClient.Timeout = timeout
+		}
 	}
 }
