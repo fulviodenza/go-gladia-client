@@ -91,8 +91,8 @@ type RealtimeProcessing struct {
 
 // InnerVocabularyConfig contains vocabulary configuration settings
 type InnerVocabularyConfig struct {
-	Vocabulary       []interface{} `json:"vocabulary,omitempty"` // Can be string or VocabularyEntry
-	DefaultIntensity float64       `json:"default_intensity,omitempty"`
+	Vocabulary       []any   `json:"vocabulary,omitempty"` // Can be string or VocabularyEntry
+	DefaultIntensity float64 `json:"default_intensity,omitempty"`
 }
 
 // VocabularyConfig contains vocabulary settings
@@ -188,7 +188,7 @@ type TranscriptionMetadata struct {
 	AudioDuration            float64 `json:"audio_duration"`
 	NumberOfDistinctChannels int     `json:"number_of_distinct_channels"`
 	BillingTime              float64 `json:"billing_time"`
-	TranscriptionTime        int     `json:"transcription_time"`
+	TranscriptionTime        float64 `json:"transcription_time"`
 }
 
 // TranscriptionData contains the actual transcription data
@@ -212,11 +212,11 @@ type TranslationResult struct {
 
 // ProcessingResult represents a generic processing result
 type ProcessingResult struct {
-	Success  bool        `json:"success"`
-	IsEmpty  bool        `json:"is_empty"`
-	ExecTime int         `json:"exec_time"`
-	Error    *ErrorInfo  `json:"error,omitempty"`
-	Results  interface{} `json:"results,omitempty"`
+	Success  bool       `json:"success"`
+	IsEmpty  bool       `json:"is_empty"`
+	ExecTime int        `json:"exec_time"`
+	Error    *ErrorInfo `json:"error,omitempty"`
+	Results  any        `json:"results,omitempty"`
 }
 
 // AudioToLLMPromptResult represents results for a specific LLM prompt
@@ -267,7 +267,7 @@ type CompletedTranscriptionResult struct {
 	Status         string                  `json:"status"`
 	CreatedAt      time.Time               `json:"created_at"`
 	CompletedAt    time.Time               `json:"completed_at,omitempty"`
-	CustomMetadata map[string]interface{}  `json:"custom_metadata,omitempty"`
+	CustomMetadata map[string]any          `json:"custom_metadata,omitempty"`
 	ErrorCode      int                     `json:"error_code,omitempty"`
 	Kind           string                  `json:"kind"`
 	File           GladiaFile              `json:"file"`
@@ -283,7 +283,7 @@ type GetTranscriptionStatus struct {
 	Status         string                   `json:"status"`
 	CreatedAt      time.Time                `json:"created_at"`
 	CompletedAt    *time.Time               `json:"completed_at,omitempty"`
-	CustomMetadata map[string]interface{}   `json:"custom_metadata,omitempty"`
+	CustomMetadata map[string]any           `json:"custom_metadata,omitempty"`
 	ErrorCode      *int                     `json:"error_code,omitempty"`
 	Kind           string                   `json:"kind"`
 	File           *GladiaFile              `json:"file,omitempty"`
