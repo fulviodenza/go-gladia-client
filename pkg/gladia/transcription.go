@@ -104,7 +104,7 @@ func (s *Client) Transcribe(ctx context.Context, audioURL string) error {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 		return fmt.Errorf("received non-200 response: %s", resp.Status)
 	}
 
@@ -152,7 +152,7 @@ func (c *Client) GetTranscriptionStatus(ctx context.Context, transcriptionID str
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 		body, _ := io.ReadAll(resp.Body)
 		return nil, fmt.Errorf("received non-200 response: %s, body: %s", resp.Status, string(body))
 	}
