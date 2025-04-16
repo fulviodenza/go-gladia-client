@@ -112,6 +112,15 @@ func (c *Client) GetTranscriptionStatus(ctx context.Context, transcriptionID str
 	return &status, nil
 }
 
+func (c *Client) DeleteTranscription(ctx context.Context, transcriptionID string) error {
+	err := c.sendJSONRequest(ctx, http.MethodDelete, transcribeEndpoint+transcriptionID, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *Client) sendJSONRequest(ctx context.Context, method, endpoint string, reqBody interface{}, respBody interface{}) error {
 	var bodyReader io.Reader
 
